@@ -14,12 +14,12 @@
     }
 
 static void *threadImpl(void * p) {
-    ThreadFuncPtr func = (ThreadFuncPtr)((uintptr_t)p);
-    func();
+    thread_args_wrapper_t *wrapper = (thread_args_wrapper_t*)p;
+    wrapper->func(wrapper->args);
     pthread_exit(NULL);
 }
 
-int threadStart(Thread *th) {
+int threadStart(thread_t *th, thread_func_t func, void *args) {
     int ret;
     pthread_attr_t attr;
     pthread_t thread = {0};
@@ -30,18 +30,21 @@ int threadStart(Thread *th) {
     ret = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
     CHECK(ret, "pthread_attr_setdetachstate");
 
-    ret = pthread_create(&thread, &attr, threadImpl, (void*)((uintptr_t)th->func));
+    th->wrapper.func = func;
+    th->wrapper.args = args;
+
+    ret = pthread_create(&thread, &attr, threadImpl, (void*)&th->wrapper);
     CHECK(ret, "pthread_create");
+
+    th->handle = thread;
 
     ret = pthread_attr_destroy(&attr);
     CHECK(ret, "pthread_attr_destroy");
 
-    th->handle = thread;
-
     return 0;
 }
 
-int threadStop(Thread th) {
+int threadStop(thread_t th) {
     void *status;
 
     int ret = pthread_join(th.handle, &status);

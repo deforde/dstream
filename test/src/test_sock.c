@@ -13,7 +13,7 @@
 
 #define TST_MSG "hello, world"
 
-static void serverThreadFunc(void) {
+static void serverThreadFunc(__attribute__((unused)) void *p) {
     int s = acceptClientConnection();
     TEST_ASSERT_NOT_EQUAL(-1, s);
 
@@ -25,7 +25,7 @@ static void serverThreadFunc(void) {
     close(s);
 }
 
-static void clientThreadFunc(void) {
+static void clientThreadFunc(__attribute__((unused)) void *p) {
     int s = connectToServer();
     TEST_ASSERT_NOT_EQUAL(-1, s);
 
@@ -38,16 +38,12 @@ static void clientThreadFunc(void) {
 void testSockBasic(void) {
     int ret;
 
-    Thread server_thread = {
-        .func = serverThreadFunc,
-    };
-    ret = threadStart(&server_thread);
+    thread_t server_thread;
+    ret = threadStart(&server_thread, serverThreadFunc, NULL);
     TEST_ASSERT_NOT_EQUAL(-1, ret);
 
-    Thread client_thread = {
-        .func = clientThreadFunc,
-    };
-    ret = threadStart(&client_thread);
+    thread_t client_thread;
+    ret = threadStart(&client_thread, clientThreadFunc, NULL);
     TEST_ASSERT_NOT_EQUAL(-1, ret);
 
     ret = threadStop(client_thread);

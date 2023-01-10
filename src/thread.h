@@ -3,15 +3,20 @@
 
 #include <pthread.h>
 
-typedef void (*ThreadFuncPtr)(void);
+typedef void (*thread_func_t)(void *);
+
+typedef struct {
+    thread_func_t func;
+    void *args;
+} thread_args_wrapper_t;
 
 typedef struct {
     pthread_t handle;
-    ThreadFuncPtr func;
-} Thread;
+    thread_args_wrapper_t wrapper;
+} thread_t;
 
-int threadStart(Thread *th);
+int threadStart(thread_t *th, thread_func_t func, void *args);
 
-int threadStop(Thread th);
+int threadStop(thread_t th);
 
 #endif //THREAD_H
