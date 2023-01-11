@@ -10,7 +10,7 @@ int dstreamAcceptClientConnection(void);
 
 int dstreamConnectToServer(void);
 
-int dstreamSockSend(int s, void *buf, size_t sz);
+ssize_t dstreamSockSend(int s, void *buf, size_t sz);
 
 ssize_t dstreamSockRecv(int s, void *buf, size_t sz);
 

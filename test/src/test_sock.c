@@ -18,7 +18,7 @@ static void serverThreadFunc(__attribute__((unused)) void *p) {
     TEST_ASSERT_NOT_EQUAL(-1, s);
 
     char buf[128] = {0};
-    int rsz = dstreamSockRecv(s, buf, sizeof(buf));
+    ssize_t rsz = dstreamSockRecv(s, buf, sizeof(buf));
     TEST_ASSERT_EQUAL(strlen(TST_MSG), rsz);
     TEST_ASSERT_EQUAL(0, memcmp(buf, TST_MSG, strlen(TST_MSG)));
 
@@ -29,8 +29,8 @@ static void clientThreadFunc(__attribute__((unused)) void *p) {
     int s = dstreamConnectToServer();
     TEST_ASSERT_NOT_EQUAL(-1, s);
 
-    int res = dstreamSockSend(s, TST_MSG, strlen(TST_MSG));
-    TEST_ASSERT_EQUAL(0, res);
+    ssize_t res = dstreamSockSend(s, TST_MSG, strlen(TST_MSG));
+    TEST_ASSERT_EQUAL(strlen(TST_MSG), res);
 
     close(s);
 }

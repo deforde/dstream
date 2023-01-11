@@ -65,12 +65,12 @@ int dstreamConnectToServer(void) {
     return s;
 }
 
-int dstreamSockSend(int s, void *buf, size_t sz) {
-    if(send(s, buf, sz, 0) == -1) {
+ssize_t dstreamSockSend(int s, void *buf, size_t sz) {
+    ssize_t ssz = send(s, buf, sz, 0);
+    if(ssz == -1) {
         perror("send");
-        return -1;
     }
-    return 0;
+    return ssz;
 }
 
 ssize_t dstreamSockRecv(int s, void *buf, size_t sz) {

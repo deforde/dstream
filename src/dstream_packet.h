@@ -20,6 +20,10 @@ typedef enum {
 typedef struct {
     int data_type;
     size_t sz;
+} dstream_packet_header_t;
+
+typedef struct {
+    dstream_packet_header_t hdr;
     uint8_t data[];
 } dstream_packet_t;
 
@@ -32,5 +36,9 @@ void *dstreamPacketGetDataElem(void *data, int data_type, size_t sz, size_t i);
 dstream_packet_t *dstreamPacketPack(int data_type, const char *nm, void *data, size_t sz);
 
 void dstreamPacketUnpack(dstream_packet_t *packet, int *pdata_type, const char **pnm, void **pdata, size_t *pdata_len);
+
+size_t dstreamPacketGetTotalSize(dstream_packet_t *p);
+
+dstream_packet_t *dstreamPacketAlloc(dstream_packet_header_t hdr);
 
 #endif //DSTREAM_PACKET_H
