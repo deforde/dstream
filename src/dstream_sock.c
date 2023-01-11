@@ -1,4 +1,4 @@
-#include "sock.h"
+#include "dstream_sock.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +9,7 @@
 
 #define SOCK_PATH "dstream_socket"
 
-int acceptClientConnection(void) {
+int dstreamAcceptClientConnection(void) {
     const int s = socket(AF_UNIX, SOCK_STREAM, 0);
     if (s == -1) {
         perror("socket");
@@ -44,7 +44,7 @@ int acceptClientConnection(void) {
     return s2;
 }
 
-int connectToServer(void) {
+int dstreamConnectToServer(void) {
     const int s = socket(AF_UNIX, SOCK_STREAM, 0);
     if (s == -1) {
         perror("socket");
@@ -65,7 +65,7 @@ int connectToServer(void) {
     return s;
 }
 
-int sockSend(int s, void *buf, size_t sz) {
+int dstreamSockSend(int s, void *buf, size_t sz) {
     if(send(s, buf, sz, 0) == -1) {
         perror("send");
         return -1;
@@ -73,7 +73,7 @@ int sockSend(int s, void *buf, size_t sz) {
     return 0;
 }
 
-ssize_t sockRecv(int s, void *buf, size_t sz) {
+ssize_t dstreamSockRecv(int s, void *buf, size_t sz) {
     ssize_t rsz = recv(s, buf, sz, 0);
     if (rsz == -1) {
         perror("recv");

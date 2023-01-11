@@ -8,17 +8,17 @@
 
 #include <unity.h>
 
-#include "sock.h"
+#include "dstream_sock.h"
 #include "thread.h"
 
 #define TST_MSG "hello, world"
 
 static void serverThreadFunc(__attribute__((unused)) void *p) {
-    int s = acceptClientConnection();
+    int s = dstreamAcceptClientConnection();
     TEST_ASSERT_NOT_EQUAL(-1, s);
 
     char buf[128] = {0};
-    int rsz = sockRecv(s, buf, sizeof(buf));
+    int rsz = dstreamSockRecv(s, buf, sizeof(buf));
     TEST_ASSERT_EQUAL(strlen(TST_MSG), rsz);
     TEST_ASSERT_EQUAL(0, memcmp(buf, TST_MSG, strlen(TST_MSG)));
 
@@ -26,10 +26,10 @@ static void serverThreadFunc(__attribute__((unused)) void *p) {
 }
 
 static void clientThreadFunc(__attribute__((unused)) void *p) {
-    int s = connectToServer();
+    int s = dstreamConnectToServer();
     TEST_ASSERT_NOT_EQUAL(-1, s);
 
-    int res = sockSend(s, TST_MSG, strlen(TST_MSG));
+    int res = dstreamSockSend(s, TST_MSG, strlen(TST_MSG));
     TEST_ASSERT_EQUAL(0, res);
 
     close(s);

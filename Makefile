@@ -18,6 +18,9 @@ SRCS += implot/implot_items.cpp
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
+LIB_SRCS := $(shell find $(SRC_DIRS) -name 'dstream_*.c')
+LIB_OBJS := $(LIB_SRCS:%=$(BUILD_DIR)/%.o)
+
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_DIRS += imgui imgui/backends /usr/include/SDL2 implot
 
@@ -55,8 +58,9 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-lib: all $(OBJS)
-	$(AR) -rcs $(BUILD_DIR)/lib$(TARGET_NAME).a $(BUILD_DIR)/src/dstream_packet.c.o $(BUILD_DIR)/src/sock.c.o
+lib: CFLAGS += -O3 -DNDEBUG
+lib: $(LIB_OBJS)
+	$(AR) -rcs $(BUILD_DIR)/lib$(TARGET_NAME).a $(LIB_OBJS)
 
 .PHONY: clean compdb valgrind run test test-compdb
 
