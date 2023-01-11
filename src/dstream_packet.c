@@ -67,7 +67,14 @@ void *dstreamPacketGetDataElem(void *data, int data_type, __attribute__((unused)
 }
 
 dstream_packet_t *dstreamPacketPack(int data_type, const char *nm, void *data, size_t sz) {
-    const size_t packet_sz = sizeof(dstream_packet_t) + strlen(nm) + 1 + sz;
+    const size_t dsz = dstreamPacketGetDataSize(data_type);
+
+    size_t nmsz = strlen(nm) + 1;
+    if (nmsz % dsz != 0) {
+        nmsz = (nmsz / dsz + 1) * dsz;
+    }
+
+    const size_t packet_sz = sizeof(dstream_packet_t) + nmsz + sz;
     void *buf = calloc(1, packet_sz);
     if (buf == NULL) {
         puts("memory alloc failure");
@@ -78,7 +85,7 @@ dstream_packet_t *dstreamPacketPack(int data_type, const char *nm, void *data, s
     p->hdr.sz = packet_sz - sizeof(p->hdr);
     p->hdr.data_type = data_type;
     memcpy(p->data, nm, strlen(nm));
-    memcpy(p->data + strlen(nm) + 1, data, sz);
+    memcpy(p->data + nmsz, data, sz);
 
     return p;
 }
@@ -86,9 +93,15 @@ dstream_packet_t *dstreamPacketPack(int data_type, const char *nm, void *data, s
 void dstreamPacketUnpack(dstream_packet_t *packet, int *pdata_type, const char **pnm, void **pdata, size_t *pdata_len) {
     *pdata_type = packet->hdr.data_type;
     *pnm = (const char*)packet->data;
-    const size_t nm_len = strlen(*pnm) + 1;
-    *pdata = &packet->data[nm_len];
-    *pdata_len = packet->hdr.sz - nm_len;
+
+    const size_t dsz = dstreamPacketGetDataSize(*pdata_type);
+    size_t nmsz = strlen(*pnm) + 1;
+    if (nmsz % dsz != 0) {
+        nmsz = (nmsz / dsz + 1) * dsz;
+    }
+
+    *pdata = &packet->data[nmsz];
+    *pdata_len = packet->hdr.sz - nmsz;
 }
 
 size_t dstreamPacketGetTotalSize(dstream_packet_t *p) {

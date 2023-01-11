@@ -1,17 +1,27 @@
 #include "gui.h"
 
-#include "imgui.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_sdl.h"
-#include "implot.h"
+#include <time.h>
+#include <string.h>
+
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl.h>
+#include <implot.h>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-int runDemo() {
+#include "dstream_packet.h"
+#include "queue.h"
+
+#define PLOT_WIDTH 1000
+
+void guiThread(void *p) {
+    queue_t *q = (queue_t*)p;
+
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
         printf("Error: %s\n", SDL_GetError());
-        return -1;
+        exit(1);
     }
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
@@ -65,6 +75,25 @@ int runDemo() {
             }
         }
 
+        dstream_packet_t *packet;
+        while (queuePop(q, (void**)&packet) == -1) {
+            struct timespec ts{
+                0,
+                100000000,
+            };
+            if (nanosleep(&ts, NULL) == -1) {
+                perror("nanosleep");
+                exit(1);
+            }
+        }
+
+        int d_ty;
+        const char *nm;
+        void *data;
+        size_t sz;
+        dstreamPacketUnpack(packet, &d_ty, &nm, &data, &sz);
+        const size_t len = dstreamPacketGetDataLen(d_ty, sz);
+
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -72,22 +101,53 @@ int runDemo() {
 
         ImGui::Begin("imgui-test");
 
-        static float xs1[1001], ys1[1001];
-        for (int i = 0; i < 1001; ++i) {
-            xs1[i] = i * 0.001f;
-            ys1[i] = 0.5f +
-                     0.5f * sinf(50 * (xs1[i] + (float)ImGui::GetTime() / 10));
+        static float y[PLOT_WIDTH];
+        memmove(y, &y[len], sizeof(y) - len * sizeof(*y));
+
+        for (size_t i = 0; i < len; i++) {
+            const size_t yi = PLOT_WIDTH - len + i;
+            switch(d_ty) {
+            case U8:
+                y[yi] = *(uint8_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                break;
+            case U16:
+                y[yi] = *(uint16_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                break;
+            case U32:
+                y[yi] = *(uint32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                break;
+            case U64:
+                y[yi] = *(uint64_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                break;
+            case I8:
+                y[yi] = *(int8_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                break;
+            case I16:
+                y[yi] = *(int16_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                break;
+            case I32:
+                y[yi] = *(int32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                break;
+            case I64:
+                y[yi] = *(int64_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                break;
+            case F32:
+                y[yi] = *(float*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                break;
+            case F64:
+                y[yi] = *(double*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                break;
+            default:
+                assert(false);
+                break;
+            }
         }
-        static double xs2[20], ys2[20];
-        for (int i = 0; i < 20; ++i) {
-            xs2[i] = i * 1 / 19.0f;
-            ys2[i] = xs2[i] * xs2[i];
-        }
+
+        free(packet);
+
         if (ImPlot::BeginPlot("Line Plots")) {
             ImPlot::SetupAxes("x", "y");
-            ImPlot::PlotLine("f(x)", xs1, ys1, 1001);
-            ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle);
-            ImPlot::PlotLine("g(x)", xs2, ys2, 20, ImPlotLineFlags_Segments);
+            ImPlot::PlotLine("f(x)", y, sizeof(y) / sizeof(*y));
             ImPlot::EndPlot();
         }
 
@@ -115,6 +175,4 @@ exit:
     SDL_GL_DeleteContext(gl_context);
     SDL_DestroyWindow(window);
     SDL_Quit();
-
-    return 0;
 }

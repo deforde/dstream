@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <math.h>
 
 #include "dstream_packet.h"
 #include "dstream_sock.h"
@@ -13,16 +15,32 @@ int main(void) {
         exit(1);
     }
 
-    int32_t data[] = {0, 1};
+    float t_s = 0.f;
+    float T_s = 0.1f;
+    float f = 1.f;
+
+    float data[100] = {0};
     for(;;) {
-        dstream_packet_t *p = dstreamPacketPack(I32, "test", data, sizeof(data));
-        data[0]++;
-        data[1]++;
+        for (size_t i = 0; i < 100; i++) {
+            data[i] = 0.5f + 0.5f * sinf(2.f * M_PI * f * t_s);
+            t_s += T_s / 100.f;
+        }
+
+        dstream_packet_t *p = dstreamPacketPack(F32, "test", data, sizeof(data));
+
         const ssize_t ssz = dstreamSockSend(s, p, dstreamPacketGetTotalSize(p));
         assert(ssz == (ssize_t)dstreamPacketGetTotalSize(p));
+
         free(p);
-        puts("Sent test packet...");
-        sleep(1);
+
+        struct timespec ts = {
+            .tv_sec = 0,
+            .tv_nsec = T_s * 2000000000,
+        };
+        if (nanosleep(&ts, NULL) == -1) {
+            perror("nanosleep");
+            exit(1);
+        }
     }
 
     close(s);

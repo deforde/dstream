@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-int runDemo(void);
+void guiThread(void *p);
 
 #ifdef __cplusplus
 }

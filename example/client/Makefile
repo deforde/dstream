@@ -14,7 +14,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 DSTREAM_LIB := ../../build/libdstream.a
 
 CFLAGS := -Wall -Wextra -Wpedantic -Werror $(INC_FLAGS) -MMD -MP
-LDFLAGS := $(DSTREAM_LIB)
+LDFLAGS := $(DSTREAM_LIB) -lm
 
 TARGET := $(BUILD_DIR)/$(TARGET_NAME)
 

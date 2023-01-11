@@ -4,6 +4,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     U8,
     U16,
@@ -17,6 +21,7 @@ typedef enum {
     F64,
 } dstream_data_type_e;
 
+#ifndef __cplusplus
 typedef struct {
     int data_type;
     size_t sz;
@@ -26,6 +31,10 @@ typedef struct {
     dstream_packet_header_t hdr;
     uint8_t data[];
 } dstream_packet_t;
+#else
+typedef struct dstream_packet_header_t dstream_packet_header_t;
+typedef struct dstream_packet_t dstream_packet_t;
+#endif
 
 size_t dstreamPacketGetDataSize(int data_type);
 
@@ -40,5 +49,9 @@ void dstreamPacketUnpack(dstream_packet_t *packet, int *pdata_type, const char *
 size_t dstreamPacketGetTotalSize(dstream_packet_t *p);
 
 dstream_packet_t *dstreamPacketAlloc(dstream_packet_header_t hdr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DSTREAM_PACKET_H

@@ -7,6 +7,10 @@
 
 #define QUEUE_CAPACITY 10
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     void *store[QUEUE_CAPACITY];
     size_t head;
@@ -26,5 +30,9 @@ int queuePush(queue_t *q, void *e);
 int queuePop(queue_t *q, void **pe);
 
 void *queuePeek(queue_t *q);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //QUEUE_H
