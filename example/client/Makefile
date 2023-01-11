@@ -40,7 +40,7 @@ $(BUILD_DIR)/%.c.o: %.c
 $(DSTREAM_LIB):
 	make -C ../.. lib
 
-.PHONY: clean compdb valgrind
+.PHONY: clean compdb valgrind run
 
 clean:
 	@rm -rf $(addprefix $(BUILD_DIR)/,$(filter-out compile_commands.json,$(shell ls $(BUILD_DIR))))
@@ -51,5 +51,8 @@ compdb: clean
 
 valgrind: debug
 	@valgrind ./$(TARGET)
+
+run: san
+	./$(TARGET)
 
 -include $(DEPS)

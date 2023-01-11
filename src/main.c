@@ -20,6 +20,10 @@ int main(void) {
         dstream_packet_header_t hdr = {0};
 
         rsz = dstreamSockRecv(s, &hdr, sizeof(hdr));
+        if (rsz == 0) {
+            puts("remote endpoint disconnected");
+            break;
+        }
         if (rsz != sizeof(hdr)) {
             puts("failed to read packet header");
             exit(1);
