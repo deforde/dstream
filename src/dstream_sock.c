@@ -7,7 +7,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-#define SOCK_PATH "dstream_socket"
+#define SOCK_PATH "/tmp/dstream_socket"
 
 int dstreamAcceptClientConnection(void) {
     const int s = socket(AF_UNIX, SOCK_STREAM, 0);

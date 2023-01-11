@@ -13,9 +13,10 @@ int main(void) {
         exit(1);
     }
 
-    size_t i = 0;
+    int32_t i = 0;
     for(;;) {
         dstream_packet_t *p = dstreamPacketPack(I32, "test", &i, sizeof(i));
+        i++;
         const ssize_t ssz = dstreamSockSend(s, p, dstreamPacketGetTotalSize(p));
         assert(ssz == (ssize_t)dstreamPacketGetTotalSize(p));
         free(p);
