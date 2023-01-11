@@ -22,7 +22,7 @@ LIB_SRCS := $(shell find $(SRC_DIRS) -name 'dstream_*.c')
 LIB_OBJS := $(LIB_SRCS:%=$(BUILD_DIR)/%.o)
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-INC_DIRS += imgui imgui/backends /usr/include/SDL2 implot
+INC_DIRS += include imgui imgui/backends /usr/include/SDL2 implot
 
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 

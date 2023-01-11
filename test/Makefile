@@ -24,7 +24,7 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-INC_DIRS += ../imgui ../imgui/backends /usr/include/SDL2 ../implot
+INC_DIRS += ../include ../imgui ../imgui/backends /usr/include/SDL2 ../implot
 INC_DIRS += $(UNITY_INC_DIR)
 
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))

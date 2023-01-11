@@ -8,7 +8,7 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-INC_DIRS += ../../src
+INC_DIRS += ../../src ../../include
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 DSTREAM_LIB := ../../build/libdstream.a
