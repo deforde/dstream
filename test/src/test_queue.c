@@ -61,4 +61,6 @@ void testQueueBasic(void) {
         TEST_ASSERT_EQUAL((i + 1), queueFreeSpace(&q));
     }
     TEST_ASSERT_EQUAL(-1, queuePop(&q, NULL));
+
+    queueDestroy(&q);
 }

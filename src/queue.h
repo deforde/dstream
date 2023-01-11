@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 
+#include <pthread.h>
+
 #define QUEUE_CAPACITY 10
 
 typedef struct {
@@ -10,9 +12,12 @@ typedef struct {
     size_t head;
     size_t tail;
     size_t len;
+    pthread_mutex_t mx;
 } queue_t;
 
 void queueInit(queue_t *q);
+
+void queueDestroy(queue_t *q);
 
 size_t queueFreeSpace(queue_t *q);
 
