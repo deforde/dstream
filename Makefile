@@ -32,15 +32,15 @@ TARGET := $(BUILD_DIR)/$(TARGET_NAME)
 
 TEST_DIR := test
 
-san: debug
-san: CFLAGS += -fsanitize=address,undefined
-san: LDFLAGS += -fsanitize=address,undefined
-
 all: CFLAGS += -O3 -DNDEBUG
 all: target
 
 debug: CFLAGS += -g3 -D_FORTIFY_SOURCE=2
 debug: target
+
+san: debug
+san: CFLAGS += -fsanitize=address,undefined
+san: LDFLAGS += -fsanitize=address,undefined
 
 target: imgui implot $(TARGET)
 
@@ -55,13 +55,16 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+lib: all $(OBJS)
+	$(AR) -rcs $(BUILD_DIR)/lib$(TARGET_NAME).a $(BUILD_DIR)/src/dstream_packet.c.o $(BUILD_DIR)/src/sock.c.o
+
 .PHONY: clean compdb valgrind run test test-compdb
 
 run: san
 	./$(TARGET)
 
 clean:
-	@rm -rf $(BUILD_DIR)
+	@rm -rf $(addprefix $(BUILD_DIR)/,$(filter-out compile_commands.json,$(shell ls $(BUILD_DIR))))
 
 compdb: clean
 	@bear -- $(MAKE) san

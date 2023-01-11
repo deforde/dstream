@@ -1,4 +1,4 @@
-#include "packet.h"
+#include "dstream_packet.h"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-size_t getDataSize(int data_type) {
+size_t dstreamPacketGetDataSize(int data_type) {
     switch(data_type) {
     case U8:
         return sizeof(uint8_t);
@@ -30,15 +30,16 @@ size_t getDataSize(int data_type) {
         return sizeof(double);
     }
     assert(false);
+    return 0;
 }
 
-size_t getDataLen(int data_type, size_t sz) {
-    assert(sz % getDataSize(data_type) == 0);
-    return sz / getDataSize(data_type);
+size_t dstreamPacketGetDataLen(int data_type, size_t sz) {
+    assert(sz % dstreamPacketGetDataSize(data_type) == 0);
+    return sz / dstreamPacketGetDataSize(data_type);
 }
 
-void *getDataElem(void *data, int data_type, size_t sz, size_t i) {
-    assert(i < getDataLen(data_type, sz));
+void *dstreamPacketGetDataElem(void *data, int data_type, __attribute__((unused)) size_t sz, size_t i) {
+    assert(i < dstreamPacketGetDataLen(data_type, sz));
     switch(data_type) {
     case U8:
         return &((uint8_t*)data)[i];
@@ -62,16 +63,17 @@ void *getDataElem(void *data, int data_type, size_t sz, size_t i) {
         return &((double*)data)[i];
     }
     assert(false);
+    return NULL;
 }
 
-packet_t *packetPack(int data_type, const char *nm, void *data, size_t sz) {
-    const size_t packet_sz = sizeof(packet_t) + strlen(nm) + 1 + sz;
+dstream_packet_t *dstreamPacketPack(int data_type, const char *nm, void *data, size_t sz) {
+    const size_t packet_sz = sizeof(dstream_packet_t) + strlen(nm) + 1 + sz;
     void *buf = calloc(1, packet_sz);
     if (buf == NULL) {
         puts("memory alloc failure\n");
         exit(1);
     }
-    packet_t *p = buf;
+    dstream_packet_t *p = buf;
 
     p->sz = packet_sz - ((intptr_t)p->data - (intptr_t)p);
     p->data_type = data_type;
@@ -81,7 +83,7 @@ packet_t *packetPack(int data_type, const char *nm, void *data, size_t sz) {
     return p;
 }
 
-void packetUnpack(packet_t *packet, int *pdata_type, const char **pnm, void **pdata, size_t *pdata_len) {
+void dstreamPacketUnpack(dstream_packet_t *packet, int *pdata_type, const char **pnm, void **pdata, size_t *pdata_len) {
     *pdata_type = packet->data_type;
     *pnm = (const char*)packet->data;
     const size_t nm_len = strlen(*pnm) + 1;
