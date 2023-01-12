@@ -7,7 +7,7 @@
 #include <string.h>
 
 size_t dstreamPacketGetDataSize(int data_type) {
-    switch(data_type) {
+    switch (data_type) {
     case U8:
         return sizeof(uint8_t);
     case U16:
@@ -38,35 +38,37 @@ size_t dstreamPacketGetDataLen(int data_type, size_t sz) {
     return sz / dstreamPacketGetDataSize(data_type);
 }
 
-void *dstreamPacketGetDataElem(void *data, int data_type, __attribute__((unused)) size_t sz, size_t i) {
+void *dstreamPacketGetDataElem(void *data, int data_type,
+                               __attribute__((unused)) size_t sz, size_t i) {
     assert(i < dstreamPacketGetDataLen(data_type, sz));
-    switch(data_type) {
+    switch (data_type) {
     case U8:
-        return &((uint8_t*)data)[i];
+        return &((uint8_t *)data)[i];
     case U16:
-        return &((uint16_t*)data)[i];
+        return &((uint16_t *)data)[i];
     case U32:
-        return &((uint32_t*)data)[i];
+        return &((uint32_t *)data)[i];
     case U64:
-        return &((uint64_t*)data)[i];
+        return &((uint64_t *)data)[i];
     case I8:
-        return &((int8_t*)data)[i];
+        return &((int8_t *)data)[i];
     case I16:
-        return &((int16_t*)data)[i];
+        return &((int16_t *)data)[i];
     case I32:
-        return &((int32_t*)data)[i];
+        return &((int32_t *)data)[i];
     case I64:
-        return &((int64_t*)data)[i];
+        return &((int64_t *)data)[i];
     case F32:
-        return &((float*)data)[i];
+        return &((float *)data)[i];
     case F64:
-        return &((double*)data)[i];
+        return &((double *)data)[i];
     }
     assert(false);
     return NULL;
 }
 
-dstream_packet_t *dstreamPacketPack(int data_type, const char *nm, void *data, size_t sz) {
+dstream_packet_t *dstreamPacketPack(int data_type, const char *nm, void *data,
+                                    size_t sz) {
     const size_t dsz = dstreamPacketGetDataSize(data_type);
 
     size_t nmsz = strlen(nm) + 1;
@@ -90,9 +92,10 @@ dstream_packet_t *dstreamPacketPack(int data_type, const char *nm, void *data, s
     return p;
 }
 
-void dstreamPacketUnpack(dstream_packet_t *packet, int *pdata_type, const char **pnm, void **pdata, size_t *pdata_len) {
+void dstreamPacketUnpack(dstream_packet_t *packet, int *pdata_type,
+                         const char **pnm, void **pdata, size_t *pdata_len) {
     *pdata_type = packet->hdr.data_type;
-    *pnm = (const char*)packet->data;
+    *pnm = (const char *)packet->data;
 
     const size_t dsz = dstreamPacketGetDataSize(*pdata_type);
     size_t nmsz = strlen(*pnm) + 1;

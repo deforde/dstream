@@ -19,7 +19,7 @@ void serverThread(void *p) {
         exit(1);
     }
 
-    for(;;) {
+    for (;;) {
         ssize_t rsz = 0;
         dstream_packet_header_t hdr = {0};
 

@@ -27,7 +27,8 @@ void testPacketBasic(void) {
     TEST_ASSERT_EQUAL(sizeof(arr) / sizeof(*arr), len);
 
     for (size_t i = 0; i < len; i++) {
-        TEST_ASSERT_EQUAL(arr[i], *(int32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i));
+        TEST_ASSERT_EQUAL(
+            arr[i], *(int32_t *)dstreamPacketGetDataElem(data, d_ty, sz, i));
     }
 
     free(p);

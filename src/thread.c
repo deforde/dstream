@@ -13,8 +13,8 @@
         }                                                                      \
     }
 
-static void *threadImpl(void * p) {
-    thread_args_wrapper_t *wrapper = (thread_args_wrapper_t*)p;
+static void *threadImpl(void *p) {
+    thread_args_wrapper_t *wrapper = (thread_args_wrapper_t *)p;
     wrapper->func(wrapper->args);
     pthread_exit(NULL);
 }
@@ -33,7 +33,7 @@ int threadStart(thread_t *th, thread_func_t func, void *args) {
     th->wrapper.func = func;
     th->wrapper.args = args;
 
-    ret = pthread_create(&thread, &attr, threadImpl, (void*)&th->wrapper);
+    ret = pthread_create(&thread, &attr, threadImpl, (void *)&th->wrapper);
     CHECK(ret, "pthread_create");
 
     th->handle = thread;

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from ctypes import c_char
 from enum import Enum
 from math import sin, pi
 import socket
@@ -28,9 +27,17 @@ def getDataSize(d_ty: Dstream_Data_Type):
         return 1
     elif d_ty == Dstream_Data_Type.U16 or d_ty == Dstream_Data_Type.I16:
         return 2
-    elif d_ty == Dstream_Data_Type.U32 or d_ty == Dstream_Data_Type.I32 or d_ty == Dstream_Data_Type.F32:
+    elif (
+        d_ty == Dstream_Data_Type.U32
+        or d_ty == Dstream_Data_Type.I32
+        or d_ty == Dstream_Data_Type.F32
+    ):
         return 4
-    elif d_ty == Dstream_Data_Type.U64 or d_ty == Dstream_Data_Type.I64 or d_ty == Dstream_Data_Type.F64:
+    elif (
+        d_ty == Dstream_Data_Type.U64
+        or d_ty == Dstream_Data_Type.I64
+        or d_ty == Dstream_Data_Type.F64
+    ):
         return 8
 
 
@@ -84,7 +91,7 @@ with socket.socket(family=socket.AF_UNIX, type=socket.SOCK_STREAM) as sock:
     T_s = 0.1
     freq = 1.0
 
-    while(True):
+    while True:
         data = []
         for _ in range(100):
             data.append(0.5 + 0.5 * sin(2 * pi * freq * t_s))

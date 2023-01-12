@@ -67,7 +67,7 @@ int dstreamConnectToServer(void) {
 
 ssize_t dstreamSockSend(int s, void *buf, size_t sz) {
     ssize_t ssz = send(s, buf, sz, 0);
-    if(ssz == -1) {
+    if (ssz == -1) {
         perror("send");
     }
     return ssz;

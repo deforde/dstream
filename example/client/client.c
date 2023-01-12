@@ -1,8 +1,8 @@
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <math.h>
 
 #include "dstream_packet.h"
 #include "dstream_sock.h"
@@ -20,13 +20,14 @@ int main(void) {
     float freq = 1.f;
 
     float data[100] = {0};
-    for(;;) {
+    for (;;) {
         for (size_t i = 0; i < 100; i++) {
             data[i] = 0.5f + 0.5f * sinf(2.f * M_PI * freq * t_s);
             t_s += T_s / 100.f;
         }
 
-        dstream_packet_t *p = dstreamPacketPack(F32, "test", data, sizeof(data));
+        dstream_packet_t *p =
+            dstreamPacketPack(F32, "test", data, sizeof(data));
 
         const ssize_t ssz = dstreamSockSend(s, p, dstreamPacketGetTotalSize(p));
         assert(ssz == (ssize_t)dstreamPacketGetTotalSize(p));

@@ -3,4 +3,4 @@
 
 void serverThread(void *p);
 
-#endif //SERVER_H
+#endif // SERVER_H

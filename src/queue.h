@@ -49,4 +49,4 @@ void *queuePeek(queue_t *q);
 }
 #endif
 
-#endif //QUEUE_H
+#endif // QUEUE_H

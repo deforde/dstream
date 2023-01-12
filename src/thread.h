@@ -19,4 +19,4 @@ int threadStart(thread_t *th, thread_func_t func, void *args);
 
 int threadStop(thread_t th);
 
-#endif //THREAD_H
+#endif // THREAD_H

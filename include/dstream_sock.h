@@ -22,4 +22,4 @@ ssize_t dstreamSockRecv(int s, void *buf, size_t sz);
 }
 #endif
 
-#endif //SOCK_H
+#endif // SOCK_H
