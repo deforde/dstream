@@ -17,12 +17,12 @@ int main(void) {
 
     float t_s = 0.f;
     float T_s = 0.1f;
-    float f = 1.f;
+    float freq = 1.f;
 
     float data[100] = {0};
     for(;;) {
         for (size_t i = 0; i < 100; i++) {
-            data[i] = 0.5f + 0.5f * sinf(2.f * M_PI * f * t_s);
+            data[i] = 0.5f + 0.5f * sinf(2.f * M_PI * freq * t_s);
             t_s += T_s / 100.f;
         }
 

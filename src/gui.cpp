@@ -1,7 +1,7 @@
 #include "gui.h"
 
-#include <time.h>
 #include <string.h>
+#include <time.h>
 
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
@@ -101,41 +101,41 @@ void guiThread(void *p) {
 
         ImGui::Begin("imgui-test");
 
-        static float y[PLOT_WIDTH];
+        static float y[PLOT_WIDTH] = {0};
         memmove(y, &y[len], sizeof(y) - len * sizeof(*y));
 
         for (size_t i = 0; i < len; i++) {
             const size_t yi = PLOT_WIDTH - len + i;
             switch(d_ty) {
             case U8:
-                y[yi] = *(uint8_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                y[yi] = *(uint8_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
                 break;
             case U16:
-                y[yi] = *(uint16_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                y[yi] = *(uint16_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
                 break;
             case U32:
-                y[yi] = *(uint32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                y[yi] = *(uint32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
                 break;
             case U64:
-                y[yi] = *(uint64_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                y[yi] = *(uint64_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
                 break;
             case I8:
-                y[yi] = *(int8_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                y[yi] = *(int8_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
                 break;
             case I16:
-                y[yi] = *(int16_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                y[yi] = *(int16_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
                 break;
             case I32:
-                y[yi] = *(int32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                y[yi] = *(int32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
                 break;
             case I64:
-                y[yi] = *(int64_t*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                y[yi] = *(int64_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
                 break;
             case F32:
-                y[yi] = *(float*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                y[yi] = *(float*)dstreamPacketGetDataElem(data, d_ty, sz, i);
                 break;
             case F64:
-                y[yi] = *(double*)dstreamPacketGetDataElem(data, d_ty, sz, i++);
+                y[yi] = *(double*)dstreamPacketGetDataElem(data, d_ty, sz, i);
                 break;
             default:
                 assert(false);
