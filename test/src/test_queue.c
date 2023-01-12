@@ -76,18 +76,10 @@ static void threadTx(void *p) {
     queue_t *q = p;
 
     int32_t data[] = {0, 1};
-    for (size_t j = 0; j < 10; j++) {
-        dstream_packet_t *p = dstreamPacketPack(I32, "test", data, sizeof(data));
-        while (queuePush(q, p) == -1) {
-            struct timespec ts = {
-                .tv_sec = 0,
-                .tv_nsec = 100000000,
-            };
-            if (nanosleep(&ts, NULL) == -1) {
-                perror("nanosleep");
-                exit(1);
-            }
-        }
+    for (size_t j = 0; j < 20; j++) {
+        dstream_packet_t *packet = dstreamPacketPack(I32, "test", data, sizeof(data));
+
+        queuePushBlock(q, packet);
 
         data[0]++;
         data[1]++;
@@ -98,18 +90,10 @@ static void threadRx(void *p) {
     queue_t *q = p;
 
     int32_t exp_data[] = {0, 1};
-    for (size_t j = 0; j < 10; j++) {
+    for (size_t j = 0; j < 20; j++) {
         dstream_packet_t *packet;
-        while (queuePop(q, (void**)&packet) == -1) {
-            struct timespec ts = {
-                .tv_sec = 0,
-                .tv_nsec = 100000000,
-            };
-            if (nanosleep(&ts, NULL) == -1) {
-                perror("nanosleep");
-                exit(1);
-            }
-        }
+
+        queuePopBlock(q, (void**)&packet);
 
         int d_ty;
         const char *nm;
