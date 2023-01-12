@@ -7,7 +7,10 @@
 
 #include "cJSON.h"
 
-static void buildStringList(cJSON *obj, const char *key, char***pout) {
+#define GDB_EXTS_FILEPATH "gdb_extensions.py"
+#define GDB_CMDS_FILEPATH "/tmp/gdb_cmds"
+
+static void buildStringList(cJSON *obj, const char *key, char ***pout) {
     cJSON *list = cJSON_GetObjectItemCaseSensitive(obj, key);
     if (!cJSON_IsArray(list)) {
         printf("config error for key: \"%s\"\n", key);
@@ -15,14 +18,10 @@ static void buildStringList(cJSON *obj, const char *key, char***pout) {
     }
     cJSON *item;
     size_t i = 0;
-    cJSON_ArrayForEach(item, list)
-    {
-        i++;
-    }
+    cJSON_ArrayForEach(item, list) { i++; }
     *pout = calloc(1, (i + 1) * sizeof(**pout));
     i = 0;
-    cJSON_ArrayForEach(item, list)
-    {
+    cJSON_ArrayForEach(item, list) {
         if (!cJSON_IsString(item) || item->valuestring == NULL) {
             printf("config error for key: \"%s\", at index: %zu\n", key, i);
             exit(1);
@@ -56,14 +55,10 @@ config_t configParse(const char *cfg_content) {
     }
     cJSON *local;
     size_t i = 0;
-    cJSON_ArrayForEach(local, locals)
-    {
-        i++;
-    }
+    cJSON_ArrayForEach(local, locals) { i++; }
     cfg.locals = calloc(1, (i + 1) * sizeof(*cfg.locals));
     i = 0;
-    cJSON_ArrayForEach(local, locals)
-    {
+    cJSON_ArrayForEach(local, locals) {
         if (!cJSON_IsObject(local)) {
             printf("config error for key: \"locals\", at index: %zu\n", i);
             exit(1);
@@ -92,14 +87,10 @@ config_t configParse(const char *cfg_content) {
     }
     cJSON *sttc;
     i = 0;
-    cJSON_ArrayForEach(sttc, statics)
-    {
-        i++;
-    }
+    cJSON_ArrayForEach(sttc, statics) { i++; }
     cfg.statics = calloc(1, (i + 1) * sizeof(*cfg.statics));
     i = 0;
-    cJSON_ArrayForEach(sttc, statics)
-    {
+    cJSON_ArrayForEach(sttc, statics) {
         if (!cJSON_IsObject(sttc)) {
             printf("config error for key: \"statics\", at index: %zu\n", i);
             exit(1);
@@ -158,4 +149,63 @@ void configDestroy(config_t cfg) {
         free(cfg.statics[i]);
     }
     free(cfg.statics);
+}
+
+void configGenGDBCommands(config_t cfg) {
+    FILE *f = fopen(GDB_CMDS_FILEPATH, "w");
+    if (f == NULL) {
+        printf("fopen error: \"%s\"\n", GDB_CMDS_FILEPATH);
+        exit(1);
+    }
+
+    fprintf(f,
+            "source %s\n"
+            "set breakpoint pending on\n"
+            "set print elements unlimited\n"
+            "set print repeats unlimited\n"
+            "set pagination off\n",
+            GDB_EXTS_FILEPATH);
+
+    for (size_t i = 0; cfg.globals[i]; i++) {
+        fprintf(f,
+                "watch %s\n"
+                "commands\n"
+                "silent\n"
+                "trace_data {\"id\": \"%s\"}\n"
+                "c\n"
+                "end\n",
+                cfg.globals[i], cfg.globals[i]);
+    }
+
+    for (size_t i = 0; cfg.locals[i]; i++) {
+        fprintf(f,
+                "b %s\n"
+                "commands\n"
+                "silent\n",
+                cfg.locals[i]->loc);
+        for (size_t j = 0; cfg.locals[i]->ids[j]; j++) {
+            fprintf(f, "trace_data {\"id\": \"%s\"}\n", cfg.locals[i]->ids[j]);
+        }
+        fprintf(f, "c\n"
+                   "end\n");
+    }
+
+    for (size_t i = 0; cfg.statics[i]; i++) {
+        for (size_t j = 0; cfg.statics[i]->ids[j]; j++) {
+            fprintf(f,
+                    "watch %s::%s\n"
+                    "commands\n"
+                    "silent\n"
+                    "trace_data {\"id\": \"%s\"}\n"
+                    "c\n"
+                    "end\n",
+                    cfg.statics[i]->file, cfg.statics[i]->ids[j],
+                    cfg.statics[i]->ids[j]);
+        }
+    }
+
+    fprintf(f, "r\n"
+               "q\n");
+
+    fclose(f);
 }
