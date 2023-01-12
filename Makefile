@@ -26,7 +26,7 @@ INC_DIRS += include imgui imgui/backends /usr/include/SDL2 implot
 
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CFLAGS := -Wall -Wextra -Wpedantic -Werror $(INC_FLAGS) -MMD -MP
+CFLAGS := -Wall -Wextra -Wpedantic -Werror $(INC_FLAGS) -MMD -MP -fPIC
 LDFLAGS := -lSDL2 -lGL
 
 CXXFLAGS = $(CFLAGS)
@@ -61,6 +61,10 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 lib: CFLAGS += -O3 -DNDEBUG
 lib: $(LIB_OBJS)
 	$(AR) -rcs $(BUILD_DIR)/lib$(TARGET_NAME).a $(LIB_OBJS)
+
+shlib: CFLAGS += -O3 -DNDEBUG
+shlib: $(LIB_OBJS)
+	$(CXX) --shared $(LIB_OBJS) -o $(BUILD_DIR)/lib$(TARGET_NAME).so
 
 .PHONY: clean compdb valgrind run test test-compdb
 
