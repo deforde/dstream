@@ -55,5 +55,5 @@ void testConfigBasic(void) {
     TEST_ASSERT_EQUAL_STRING("w", cfg.statics[0]->ids[0]);
     TEST_ASSERT_EQUAL_STRING("main.c", cfg.statics[0]->file);
 
-    configDestroy(&cfg);
+    configDestroy(cfg);
 }

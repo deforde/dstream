@@ -20,6 +20,6 @@ typedef struct {
 } config_t;
 
 config_t configParse(const char *cfg_content);
-void configDestroy(config_t *cfg);
+void configDestroy(config_t cfg);
 
 #endif // CONFIG_H

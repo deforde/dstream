@@ -126,36 +126,36 @@ config_t configParse(const char *cfg_content) {
     return cfg;
 }
 
-void configDestroy(config_t *cfg) {
-    free(cfg->app);
+void configDestroy(config_t cfg) {
+    free(cfg.app);
 
-    for (size_t i = 0; cfg->args[i]; i++) {
-        free(cfg->args[i]);
+    for (size_t i = 0; cfg.args[i]; i++) {
+        free(cfg.args[i]);
     }
-    free(cfg->args);
+    free(cfg.args);
 
-    for (size_t i = 0; cfg->globals[i]; i++) {
-        free(cfg->globals[i]);
+    for (size_t i = 0; cfg.globals[i]; i++) {
+        free(cfg.globals[i]);
     }
-    free(cfg->globals);
+    free(cfg.globals);
 
-    for (size_t i = 0; cfg->locals[i]; i++) {
-        for (size_t j = 0; cfg->locals[i]->ids[j]; j++) {
-            free(cfg->locals[i]->ids[j]);
+    for (size_t i = 0; cfg.locals[i]; i++) {
+        for (size_t j = 0; cfg.locals[i]->ids[j]; j++) {
+            free(cfg.locals[i]->ids[j]);
         }
-        free(cfg->locals[i]->ids);
-        free(cfg->locals[i]->loc);
-        free(cfg->locals[i]);
+        free(cfg.locals[i]->ids);
+        free(cfg.locals[i]->loc);
+        free(cfg.locals[i]);
     }
-    free(cfg->locals);
+    free(cfg.locals);
 
-    for (size_t i = 0; cfg->statics[i]; i++) {
-        for (size_t j = 0; cfg->statics[i]->ids[j]; j++) {
-            free(cfg->statics[i]->ids[j]);
+    for (size_t i = 0; cfg.statics[i]; i++) {
+        for (size_t j = 0; cfg.statics[i]->ids[j]; j++) {
+            free(cfg.statics[i]->ids[j]);
         }
-        free(cfg->statics[i]->ids);
-        free(cfg->statics[i]->file);
-        free(cfg->statics[i]);
+        free(cfg.statics[i]->ids);
+        free(cfg.statics[i]->file);
+        free(cfg.statics[i]);
     }
-    free(cfg->statics);
+    free(cfg.statics);
 }
