@@ -17,6 +17,7 @@ typedef struct {
     size_t tail;
     size_t len;
     pthread_mutex_t mx;
+    pthread_cond_t cond;
 } queue_t;
 
 void queueInit(queue_t *q);
@@ -27,7 +28,11 @@ size_t queueFreeSpace(queue_t *q);
 
 int queuePush(queue_t *q, void *e);
 
+void queuePushBlock(queue_t *q, void *e);
+
 int queuePop(queue_t *q, void **pe);
+
+void queuePopBlock(queue_t *q, void **pe);
 
 void *queuePeek(queue_t *q);
 
