@@ -71,20 +71,14 @@ void guiThread(void *p) {
                 (event.type == SDL_WINDOWEVENT &&
                  event.window.event == SDL_WINDOWEVENT_CLOSE &&
                  event.window.windowID == SDL_GetWindowID(window))) {
+                queueClose(q);
                 goto exit;
             }
         }
 
         dstream_packet_t *packet;
-        while (queuePop(q, (void**)&packet) == -1) {
-            struct timespec ts{
-                0,
-                100000000,
-            };
-            if (nanosleep(&ts, NULL) == -1) {
-                perror("nanosleep");
-                exit(1);
-            }
+        if (queuePopBlock(q, (void**)&packet) == -1) {
+            break;
         }
 
         int d_ty;

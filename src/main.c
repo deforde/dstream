@@ -38,6 +38,10 @@ int main(void) {
         exit(1);
     }
 
+    void *packet;
+    while (queuePop(&q, &packet) != -1) {
+        free(packet);
+    }
     queueDestroy(&q);
 
     return 0;

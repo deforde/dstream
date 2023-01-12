@@ -26,6 +26,7 @@ void serverThread(void *p) {
         rsz = dstreamSockRecv(s, &hdr, sizeof(hdr));
         if (rsz == 0) {
             puts("remote endpoint disconnected");
+            queueClose(q);
             break;
         }
         if (rsz != sizeof(hdr)) {
@@ -40,15 +41,9 @@ void serverThread(void *p) {
             exit(1);
         }
 
-        while (queuePush(q, packet) == -1) {
-            struct timespec ts = {
-                .tv_sec = 0,
-                .tv_nsec = 100000000,
-            };
-            if (nanosleep(&ts, NULL) == -1) {
-                perror("nanosleep");
-                exit(1);
-            }
+        if (queuePushBlock(q, packet) == -1) {
+            free(packet);
+            break;
         }
     }
 
