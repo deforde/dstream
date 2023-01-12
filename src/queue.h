@@ -17,6 +17,8 @@ typedef struct {
     size_t tail;
     size_t len;
     int open;
+    int pop_blocked;
+    int push_blocked;
     pthread_mutex_t mx;
     pthread_cond_t cond;
 } queue_t;
@@ -24,6 +26,10 @@ typedef struct {
 void queueInit(queue_t *q);
 
 void queueClose(queue_t *q);
+
+int queueIsPopBlocked(queue_t *q);
+
+int queueIsPushBlocked(queue_t *q);
 
 void queueDestroy(queue_t *q);
 

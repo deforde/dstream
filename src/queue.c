@@ -5,6 +5,8 @@ void queueInit(queue_t *q) {
     q->tail = 0;
     q->len = 0;
     q->open = 1;
+    q->pop_blocked = 0;
+    q->push_blocked = 0;
     pthread_cond_init(&q->cond, NULL);
     pthread_mutex_init(&q->mx, NULL);
 }
@@ -14,6 +16,20 @@ void queueClose(queue_t *q) {
     q->open = 0;
     pthread_mutex_unlock(&q->mx);
     pthread_cond_signal(&q->cond);
+}
+
+int queueIsPopBlocked(queue_t *q) {
+    pthread_mutex_lock(&q->mx);
+    int blocked = q->pop_blocked;
+    pthread_mutex_unlock(&q->mx);
+    return blocked;
+}
+
+int queueIsPushBlocked(queue_t *q) {
+    pthread_mutex_lock(&q->mx);
+    int blocked = q->push_blocked;
+    pthread_mutex_unlock(&q->mx);
+    return blocked;
 }
 
 void queueDestroy(queue_t *q) {
@@ -57,8 +73,10 @@ int queuePop(queue_t *q, void **pe) {
 int queuePushBlock(queue_t *q, void *e) {
     pthread_mutex_lock(&q->mx);
     while (q->len == QUEUE_CAPACITY && q->open) {
+        q->push_blocked = 1;
         pthread_cond_wait(&q->cond, &q->mx);
     }
+    q->push_blocked = 0;
     if (!q->open) {
         pthread_mutex_unlock(&q->mx);
         return -1;
@@ -74,8 +92,10 @@ int queuePushBlock(queue_t *q, void *e) {
 int queuePopBlock(queue_t *q, void **pe) {
     pthread_mutex_lock(&q->mx);
     while (q->len == 0 && q->open) {
+        q->pop_blocked = 1;
         pthread_cond_wait(&q->cond, &q->mx);
     }
+    q->pop_blocked = 0;
     if (!q->open) {
         pthread_mutex_unlock(&q->mx);
         return -1;

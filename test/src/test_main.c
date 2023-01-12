@@ -16,6 +16,7 @@ int main(void) {
     RUN_TEST(testSockBasic);
 
     RUN_TEST(testQueueThreaded);
+    RUN_TEST(testQueueBlocking);
 
     return UNITY_END();
 }

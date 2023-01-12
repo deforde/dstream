@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <unistd.h>
 
@@ -125,6 +126,88 @@ void testQueueThreaded(void) {
 
     threadStop(tx_thread);
     threadStop(rx_thread);
+
+    queueDestroy(&q);
+}
+
+typedef struct {
+    queue_t *q;
+    pthread_mutex_t *mx;
+    pthread_cond_t *cond;
+    int blocking;
+} thread_blk_args_t;
+
+static void threadBlk(void *p) {
+    thread_blk_args_t *targs = (thread_blk_args_t*)p;
+    queue_t *q = targs->q;
+    pthread_mutex_t *mx = targs->mx;
+    pthread_cond_t *cond = targs->cond;
+
+    int32_t data[] = {0, 1};
+    for (size_t j = 0; j < QUEUE_CAPACITY + 1; j++) {
+        dstream_packet_t *packet = dstreamPacketPack(I32, "test", data, sizeof(data));
+
+        if (j == QUEUE_CAPACITY) {
+            pthread_mutex_lock(mx);
+            targs->blocking = 1;
+            pthread_mutex_unlock(mx);
+            pthread_cond_signal(cond);
+        }
+
+        if (queuePushBlock(q, packet) == -1) {
+            free(packet);
+            break;
+        }
+
+        data[0]++;
+        data[1]++;
+    }
+}
+
+void testQueueBlocking(void) {
+    queue_t q;
+    queueInit(&q);
+
+    pthread_mutex_t mx;
+    pthread_mutex_init(&mx, NULL);
+
+    pthread_cond_t cond;
+    pthread_cond_init(&cond, NULL);
+
+    thread_blk_args_t targs = {
+        .q = &q,
+        .mx = &mx,
+        .cond = &cond,
+        .blocking = 0,
+    };
+
+    thread_t blk_thread;
+    threadStart(&blk_thread, threadBlk, &targs);
+
+    pthread_mutex_lock(&mx);
+    while (targs.blocking == 0) {
+        pthread_cond_wait(&cond, &mx);
+    }
+    pthread_mutex_unlock(&mx);
+
+    while(queueIsPushBlocked(&q) == 0) {
+        struct timespec ts = {
+            .tv_sec = 0,
+            .tv_nsec = 100000000,
+        };
+        nanosleep(&ts, NULL);
+    }
+
+    queueClose(&q);
+
+    threadStop(blk_thread);
+
+    TEST_ASSERT_EQUAL(0, queueIsPushBlocked(&q));
+
+    void *packet;
+    while (queuePop(&q, &packet) != -1) {
+        free(packet);
+    }
 
     queueDestroy(&q);
 }

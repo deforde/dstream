@@ -3,5 +3,6 @@
 
 void testQueueBasic(void);
 void testQueueThreaded(void);
+void testQueueBlocking(void);
 
 #endif // TEST_QUEUE_H
