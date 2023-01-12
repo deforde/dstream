@@ -19,12 +19,13 @@ SRCS += ../imgui/backends/imgui_impl_sdl.cpp
 SRCS += ../imgui/backends/imgui_impl_opengl3.cpp
 SRCS += ../implot/implot.cpp
 SRCS += ../implot/implot_items.cpp
+SRCS += ../cjson/cJSON.c
 
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-INC_DIRS += ../include ../imgui ../imgui/backends /usr/include/SDL2 ../implot
+INC_DIRS += ../include ../imgui ../imgui/backends /usr/include/SDL2 ../implot ../cjson
 INC_DIRS += $(UNITY_INC_DIR)
 
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
@@ -38,7 +39,7 @@ TARGET := $(BASE_BUILD_DIR)/$(TARGET_NAME)
 
 .PHONY: all build-only
 
-all: unity $(TARGET)
+all: unity ../imgui ../implot ../cjson $(TARGET)
 	./$(TARGET)
 
 clean:
@@ -65,5 +66,14 @@ $(UNITY_LIB):
 	cmake --build . -j 7
 
 build-only: clean unity $(TARGET)
+
+../imgui:
+	make -C .. imgui
+
+../implot:
+	make -C .. implot
+
+../cjson:
+	make -C .. cjson
 
 -include $(DEPS)

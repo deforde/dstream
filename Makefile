@@ -14,6 +14,7 @@ SRCS += imgui/backends/imgui_impl_sdl.cpp
 SRCS += imgui/backends/imgui_impl_opengl3.cpp
 SRCS += implot/implot.cpp
 SRCS += implot/implot_items.cpp
+SRCS += cjson/cJSON.c
 
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
@@ -22,7 +23,7 @@ LIB_SRCS := $(shell find $(SRC_DIRS) -name 'dstream_*.c')
 LIB_OBJS := $(LIB_SRCS:%=$(BUILD_DIR)/%.o)
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-INC_DIRS += include imgui imgui/backends /usr/include/SDL2 implot
+INC_DIRS += include imgui imgui/backends /usr/include/SDL2 implot cjson
 
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
@@ -45,7 +46,7 @@ san: debug
 san: CFLAGS += -fsanitize=address,undefined
 san: LDFLAGS += -fsanitize=address,undefined
 
-target: imgui implot $(TARGET)
+target: imgui implot cjson $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
@@ -91,10 +92,15 @@ implot:
 	curl -L https://github.com/epezent/implot/archive/refs/tags/v0.14.tar.gz | \
 	tar --strip-components=1 -xz -C implot
 
-test: imgui implot
+cjson:
+	mkdir -p cjson && \
+	curl -L https://github.com/DaveGamble/cJSON/archive/refs/tags/v1.7.15.tar.gz | \
+	tar --strip-components=1 -xz -C cjson
+
+test: imgui implot cjson
 	$(MAKE) -C $(TEST_DIR)
 
-test-compdb: imgui implot
+test-compdb: imgui implot cjson
 	bear -- $(MAKE) -C $(TEST_DIR) build-only
 	mkdir -p build
 	mv compile_commands.json build

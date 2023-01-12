@@ -1,3 +1,4 @@
+#include "test_config.h"
 #include "test_packet.h"
 #include "test_queue.h"
 #include "test_sock.h"
@@ -17,6 +18,8 @@ int main(void) {
 
     RUN_TEST(testQueueThreaded);
     RUN_TEST(testQueueBlocking);
+
+    RUN_TEST(testConfigBasic);
 
     return UNITY_END();
 }

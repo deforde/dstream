@@ -1,6 +1,7 @@
 .cache/
 imgui/
 implot/
+cjson/
 build/
 Unity/
 dstream_socket
