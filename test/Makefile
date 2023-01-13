@@ -30,7 +30,7 @@ INC_DIRS += $(UNITY_INC_DIR)
 
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CFLAGS := -g3 -Wall -Wextra -Wpedantic -Werror $(INC_FLAGS) -MMD -MP -fsanitize=address,undefined
+CFLAGS := -g3 -Wall -Wextra -Wpedantic -Werror -Wno-overlength-strings $(INC_FLAGS) -MMD -MP -fsanitize=address,undefined
 LDFLAGS := $(UNITY_LIB) -lSDL2 -lGL -fsanitize=address,undefined
 
 CXXFLAGS = $(CFLAGS)
