@@ -4,24 +4,13 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "dstream_client.h"
 #include "dstream_packet.h"
-#include "dstream_sock.h"
 
 #include <unistd.h>
 
 int main(void) {
-    int s = -1;
-    while (s == -1) {
-        s = dstreamConnectToServer();
-        struct timespec ts = {
-            .tv_sec = 1,
-            .tv_nsec = 0,
-        };
-        if (nanosleep(&ts, NULL) == -1) {
-            perror("nanosleep");
-            exit(1);
-        }
-    }
+    dstreamClientConnect();
 
     float t_s = 0.f;
     float T_s = 0.1f;
@@ -36,18 +25,8 @@ int main(void) {
             t_s += T_s / 100.f;
         }
 
-        dstream_packet_t *p = NULL;
-        ssize_t ssz = 0;
-
-        p = dstreamPacketPack(F32, "sin", sin, sizeof(sin));
-        ssz = dstreamSockSend(s, p, dstreamPacketGetTotalSize(p));
-        assert(ssz == (ssize_t)dstreamPacketGetTotalSize(p));
-        free(p);
-
-        p = dstreamPacketPack(F32, "cos", cos, sizeof(cos));
-        ssz = dstreamSockSend(s, p, dstreamPacketGetTotalSize(p));
-        assert(ssz == (ssize_t)dstreamPacketGetTotalSize(p));
-        free(p);
+        dstreamClientPackAndSend(F32, sin, sizeof(sin));
+        dstreamClientPackAndSend(F32, cos, sizeof(cos));
 
         struct timespec ts = {
             .tv_sec = 0,
@@ -59,7 +38,7 @@ int main(void) {
         }
     }
 
-    close(s);
+    dstreamClientDisconnect();
 
     return 0;
 }
