@@ -37,7 +37,7 @@ void guiThread(void *p) {
         (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE |
                           SDL_WINDOW_ALLOW_HIGHDPI);
     SDL_Window *window =
-        SDL_CreateWindow("imgui test", SDL_WINDOWPOS_CENTERED,
+        SDL_CreateWindow("dstream", SDL_WINDOWPOS_CENTERED,
                          SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
 
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
@@ -81,7 +81,7 @@ void guiThread(void *p) {
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("imgui-test");
+        ImGui::Begin("dstream");
 
         static float y[PLOT_WIDTH] = {0};
 
