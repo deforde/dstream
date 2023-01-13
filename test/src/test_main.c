@@ -1,4 +1,5 @@
 #include "test_config.h"
+#include "test_map.h"
 #include "test_packet.h"
 #include "test_queue.h"
 #include "test_sock.h"
@@ -20,6 +21,8 @@ int main(void) {
     RUN_TEST(testQueueBlocking);
 
     RUN_TEST(testConfigBasic);
+
+    RUN_TEST(testMapBasic);
 
     return UNITY_END();
 }
