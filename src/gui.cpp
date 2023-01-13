@@ -63,7 +63,7 @@ void guiThread(void *p) {
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
-    for(;;) {
+    while(queueIsOpen(q)) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
@@ -72,21 +72,9 @@ void guiThread(void *p) {
                  event.window.event == SDL_WINDOWEVENT_CLOSE &&
                  event.window.windowID == SDL_GetWindowID(window))) {
                 queueClose(q);
-                goto exit;
+                break;
             }
         }
-
-        dstream_packet_t *packet;
-        if (queuePopBlock(q, (void**)&packet) == -1) {
-            break;
-        }
-
-        int d_ty;
-        const char *nm;
-        void *data;
-        size_t sz;
-        dstreamPacketUnpack(packet, &d_ty, &nm, &data, &sz);
-        const size_t len = dstreamPacketGetDataLen(d_ty, sz);
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -96,48 +84,59 @@ void guiThread(void *p) {
         ImGui::Begin("imgui-test");
 
         static float y[PLOT_WIDTH] = {0};
-        memmove(y, &y[len], sizeof(y) - len * sizeof(*y));
 
-        for (size_t i = 0; i < len; i++) {
-            const size_t yi = PLOT_WIDTH - len + i;
-            switch(d_ty) {
-            case U8:
-                y[yi] = *(uint8_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
-                break;
-            case U16:
-                y[yi] = *(uint16_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
-                break;
-            case U32:
-                y[yi] = *(uint32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
-                break;
-            case U64:
-                y[yi] = *(uint64_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
-                break;
-            case I8:
-                y[yi] = *(int8_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
-                break;
-            case I16:
-                y[yi] = *(int16_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
-                break;
-            case I32:
-                y[yi] = *(int32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
-                break;
-            case I64:
-                y[yi] = *(int64_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
-                break;
-            case F32:
-                y[yi] = *(float*)dstreamPacketGetDataElem(data, d_ty, sz, i);
-                break;
-            case F64:
-                y[yi] = *(double*)dstreamPacketGetDataElem(data, d_ty, sz, i);
-                break;
-            default:
-                assert(false);
-                break;
+        dstream_packet_t *packet;
+        if (queueLen(q) && queuePopBlock(q, (void**)&packet) != -1) {
+            int d_ty;
+            const char *nm;
+            void *data;
+            size_t sz;
+            dstreamPacketUnpack(packet, &d_ty, &nm, &data, &sz);
+            const size_t len = dstreamPacketGetDataLen(d_ty, sz);
+
+            memmove(y, &y[len], sizeof(y) - len * sizeof(*y));
+
+            for (size_t i = 0; i < len; i++) {
+                const size_t yi = PLOT_WIDTH - len + i;
+                switch(d_ty) {
+                case U8:
+                    y[yi] = *(uint8_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
+                    break;
+                case U16:
+                    y[yi] = *(uint16_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
+                    break;
+                case U32:
+                    y[yi] = *(uint32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
+                    break;
+                case U64:
+                    y[yi] = *(uint64_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
+                    break;
+                case I8:
+                    y[yi] = *(int8_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
+                    break;
+                case I16:
+                    y[yi] = *(int16_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
+                    break;
+                case I32:
+                    y[yi] = *(int32_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
+                    break;
+                case I64:
+                    y[yi] = *(int64_t*)dstreamPacketGetDataElem(data, d_ty, sz, i);
+                    break;
+                case F32:
+                    y[yi] = *(float*)dstreamPacketGetDataElem(data, d_ty, sz, i);
+                    break;
+                case F64:
+                    y[yi] = *(double*)dstreamPacketGetDataElem(data, d_ty, sz, i);
+                    break;
+                default:
+                    assert(false);
+                    break;
+                }
             }
-        }
 
-        free(packet);
+            free(packet);
+        }
 
         if (ImPlot::BeginPlot("Line Plots")) {
             ImPlot::SetupAxes("x", "y");
@@ -157,7 +156,6 @@ void guiThread(void *p) {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
     }
-exit:
 
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();

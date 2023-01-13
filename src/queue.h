@@ -35,6 +35,8 @@ void queueDestroy(queue_t *q);
 
 size_t queueFreeSpace(queue_t *q);
 
+size_t queueLen(queue_t *q);
+
 int queuePush(queue_t *q, void *e);
 
 int queuePushBlock(queue_t *q, void *e);

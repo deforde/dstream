@@ -63,3 +63,11 @@ void serverThread(void *p) {
         close(s);
     }
 }
+
+void serverTerminate(void) {
+    int s = dstreamConnectToServer();
+    if (s == -1) {
+        return;
+    }
+    close(s);
+}

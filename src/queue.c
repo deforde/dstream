@@ -44,6 +44,13 @@ size_t queueFreeSpace(queue_t *q) {
     return fs;
 }
 
+size_t queueLen(queue_t *q) {
+    pthread_mutex_lock(&q->mx);
+    const size_t len = q->len;
+    pthread_mutex_unlock(&q->mx);
+    return len;
+}
+
 int queuePush(queue_t *q, void *e) {
     int ret = -1;
     pthread_mutex_lock(&q->mx);

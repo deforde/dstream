@@ -46,12 +46,13 @@ int main(void) {
         exit(1);
     }
 
-    ret = threadStop(server_thread);
+    ret = threadStop(gui_thread);
     if (ret == -1) {
         exit(1);
     }
 
-    ret = threadStop(gui_thread);
+    serverTerminate();
+    ret = threadStop(server_thread);
     if (ret == -1) {
         exit(1);
     }
