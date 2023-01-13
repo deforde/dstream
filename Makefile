@@ -48,6 +48,20 @@ san: LDFLAGS += -fsanitize=address,undefined
 
 target: imgui implot cjson $(TARGET)
 
+pkg: all lib shlib
+	tar -cJf dstream.tar.xz $(TARGET) $(BUILD_DIR)/lib$(TARGET_NAME).a $(BUILD_DIR)/lib$(TARGET_NAME).so include
+
+install:
+	sudo mkdir -p /usr/local/include/dstream
+	sudo cp -r include/* /usr/local/include/dstream
+	sudo cp $(TARGET) /usr/local/bin
+	sudo cp $(BUILD_DIR)/lib$(TARGET_NAME).a $(BUILD_DIR)/lib$(TARGET_NAME).so /usr/local/lib
+
+uninstall:
+	sudo rm -rf /usr/local/include/dstream
+	sudo rm -f /usr/local/bin/$(TARGET_NAME)
+	sudo rm -f /usr/local/lib/lib$(TARGET_NAME).a /usr/local/lib/lib$(TARGET_NAME).so
+
 $(TARGET): $(OBJS)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
 
