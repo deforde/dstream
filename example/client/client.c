@@ -29,7 +29,7 @@ int main(void) {
 
         struct timespec ts = {
             .tv_sec = 0,
-            .tv_nsec = T_s * 2000000000,
+            .tv_nsec = T_s * 1000000000,
         };
         if (nanosleep(&ts, NULL) == -1) {
             perror("nanosleep");
