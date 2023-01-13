@@ -3,7 +3,12 @@
 
 #include <stddef.h>
 
+#include "dstream_packet.h"
 #include "dstream_sock.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern int dstream_socket;
 
@@ -20,5 +25,9 @@ void dstreamClientDisconnect(void);
             free(p);                                                           \
         }                                                                      \
     }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // DSTREAM_CLIENT_H

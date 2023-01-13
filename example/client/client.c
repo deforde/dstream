@@ -5,7 +5,6 @@
 #include <time.h>
 
 #include "dstream_client.h"
-#include "dstream_packet.h"
 
 #include <unistd.h>
 
