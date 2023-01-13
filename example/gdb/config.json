@@ -1,0 +1,13 @@
+{
+  "app": "examples/gdb/app",
+  "args": [],
+  "globals": [],
+  "locals": [
+    {
+      "ids": ["x"],
+      "loc": "main.c:21"
+    }
+  ],
+  "statics": []
+}
+

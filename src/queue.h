@@ -45,6 +45,8 @@ int queuePopBlock(queue_t *q, void **pe);
 
 void *queuePeek(queue_t *q);
 
+int queueIsOpen(queue_t *q);
+
 #ifdef __cplusplus
 }
 #endif

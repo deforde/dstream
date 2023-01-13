@@ -6,3 +6,4 @@ build/
 Unity/
 dstream_socket
 *.ini
+app

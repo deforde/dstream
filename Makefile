@@ -27,7 +27,7 @@ INC_DIRS += include imgui imgui/backends /usr/include/SDL2 implot cjson
 
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CFLAGS := -Wall -Wextra -Wpedantic -Werror $(INC_FLAGS) -MMD -MP -fPIC
+CFLAGS := -Wall -Wextra -Wpedantic -Werror -Wno-overlength-strings $(INC_FLAGS) -MMD -MP -fPIC
 LDFLAGS := -lSDL2 -lGL
 
 CXXFLAGS = $(CFLAGS)

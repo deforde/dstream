@@ -117,3 +117,10 @@ void *queuePeek(queue_t *q) {
     pthread_mutex_unlock(&q->mx);
     return ret;
 }
+
+int queueIsOpen(queue_t *q) {
+    pthread_mutex_lock(&q->mx);
+    const int open = q->open;
+    pthread_mutex_unlock(&q->mx);
+    return open;
+}
